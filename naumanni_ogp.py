@@ -32,6 +32,11 @@ class OGPPlugin(Plugin):
     def on_filter_statuses(self, objects, entities):
         url_map = {}
         for status in objects.values():
+            # reblogしたTootのほうにはmedia_attachmentsが付かない、された方には付いている。
+            # つまりreblogのTootはskipした方がいい
+            if status.reblog:
+                continue
+
             for url in status.urls_without_media:
                 if url not in url_map:
                     url_map[url] = []
@@ -76,9 +81,20 @@ def crawl_ogp_url(url):
     # TODO: User-Agent
     response = http_client.fetch(url, raise_error=False, user_agent=USER_AGENT)
     if response.code == 200:
-        meta = parse_ogp(response.body)
-        meta['status_code'] = 200
-        return url, meta
+        content_type = response.headers['Content-Type']
+        if ';' in content_type:
+            content_type = content_type.split(';', 1)[0]
+        if content_type.lower() == 'text/html':
+            meta = parse_ogp(response.body)
+            meta['status_code'] = 200
+            return url, meta
+        else:
+            meta = {
+                'status_code': 200,
+                'content_type': content_type.lower()
+            }
+            return url, meta
+
     elif 300 <= response.code < 400:
         # redirect
         location = response.headers['Location']
@@ -108,13 +124,18 @@ def process_meta(url, meta=None, original_url=None):
             elif meta.get('link:canonical') != url:
                 next_url = meta['link:canonical']
 
-        save = {
-            'date_crawled': now,
-            'image': meta.get('og:image', meta.get('scrape:image')),
-            'description': meta.get('og:description', meta.get('scrape:description')),
-            'title': meta.get('og:title', meta.get('scrape:title')),
-            'type': meta.get('og:type', meta.get('scrape:type')),
-        }
+        if 'content_type' in meta:
+            # not html
+            save = meta.copy()
+        else:
+            save = {
+                'date_crawled': now,
+                'image': meta.get('og:image', meta.get('scrape:image')),
+                'description': meta.get('og:description', meta.get('scrape:description')),
+                'title': meta.get('og:title', meta.get('scrape:title')),
+                'type': meta.get('og:type', meta.get('scrape:type')),
+                'url': meta.get('og:url', url),
+            }
     else:
         # エラーを保存
         save = {
@@ -135,7 +156,7 @@ def process_meta(url, meta=None, original_url=None):
     # 保存するものがあれば保存
     if save:
         expires = datetime.timedelta(days=15)
-        save = json.dumps(save)
+        save = json.dumps(save, ensure_ascii=True).encode('utf-8')
         with redis.pipeline() as pipe:
             for u in set([url, original_url]):
                 key = _make_redis_key(u)

@@ -15,9 +15,10 @@ HEADING_NODES_REX = re.compile(r'h\d')
 
 def parse_ogp(html):
     """htmlを与えられたら、ParseしてOGPとcanonicalを返す
-    <link rel="canonical" href="https://github.com/graingert/opengraph/blob/master/ogp/opengraph.py" data-pjax-transient="true">
     """
     doc = BeautifulSoup(html, 'html.parser')
+    if not doc or not doc.html or not doc.html.head:
+        return {}
 
     rv = {}
     # meta og
