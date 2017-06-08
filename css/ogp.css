@@ -8,12 +8,11 @@ $ogpImageHeight: 128px;
 .ogp-urlMeta {
   display: flex;
   text-decoration: none;
-
   border: 1px solid $colorGray1;
   border-radius: 6px;
   min-height: 80px;
-
   color: $colorText;
+  overflow: hidden;
 
   &:hover {
     text-decoration: none;
