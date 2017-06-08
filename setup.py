@@ -7,6 +7,9 @@ setup(
     author_email='shn@glucose.jp',
     license='AGPL',
     py_modules=['naumanni_ogp'],
+    install_requires=[
+        'beautifulsoup4',
+    ],
     entry_points={
         'naumanni.plugins': [
             'ogp = naumanni_ogp:OGPPlugin',
