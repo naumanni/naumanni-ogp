@@ -1,0 +1,57 @@
+$ogpImageWidth: 128px;
+$ogpImageHeight: 128px;
+
+.ogp-urlMetas {
+  margin-top: $marginDefault;
+}
+
+.ogp-urlMeta {
+  display: flex;
+  text-decoration: none;
+
+  border: 1px solid $colorGray1;
+  border-radius: 6px;
+  min-height: 80px;
+
+  color: $colorText;
+
+  &:hover {
+    text-decoration: none;
+    background-color: $colorMainLightest;
+  }
+
+  .ogp-urlMeta-image {
+    flex: 0 0 $ogpImageHeight;
+    background-repeat: no-repeat;
+    background-size: cover;
+    width: $ogpImageWidth;
+    height: $ogpImageHeight;
+  }
+
+  .ogp-urlMeta-texts {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    max-height: $ogpImageHeight;
+    border-left: 1px solid $colorGray1;
+  }
+
+  .ogp-urlMeta-title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    margin: $marginHalf;
+    font-size: $fontSizeLargest;
+  }
+  .ogp-urlMeta-description {
+    flex: 1 1 auto;
+    margin: $marginHalf;
+    font-size: $fontSizeNormal;
+  }
+  .ogp-urlMeta-url {
+    margin: $marginHalf;
+    font-size: $fontSizeSmall;
+    color: $colorGray3;
+  }
+}

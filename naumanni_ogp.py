@@ -55,7 +55,11 @@ class OGPPlugin(Plugin):
                 cached_meta = json.loads(cached_meta)
                 statuses = url_map.pop(url)
                 for status in statuses:
-                    status.add_extended_attributes('ogp', cached_meta)
+                    ogps = status.get_extended_attributes('ogp', [])
+                    meta = cached_meta.copy()
+                    meta['target_url'] = url
+                    ogps.append(meta)
+                    status.add_extended_attributes('ogp', ogps)
 
         # 2. 全部celeryする。次回アクセスした時にogpが乗ってる
         logger.debug('url_map : %r', url_map)
@@ -123,6 +127,8 @@ def process_meta(url, meta=None, original_url=None):
                 next_url = meta['og:url']
             elif meta.get('link:canonical') != url:
                 next_url = meta['link:canonical']
+
+        # TODO: host名が同一かチェックする
 
         if 'content_type' in meta:
             # not html
