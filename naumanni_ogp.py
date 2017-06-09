@@ -63,7 +63,6 @@ class OGPPlugin(Plugin):
                     status.add_extended_attributes('ogp', ogps)
 
         # 2. 全部celeryする。次回アクセスした時にogpが乗ってる
-        logger.debug('url_map : %r', url_map)
         for url in url_map.keys():
             job = chain(
                 crawl_ogp_url.s(url),
