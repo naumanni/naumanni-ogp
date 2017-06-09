@@ -8,9 +8,10 @@ Statusの中のURLをみて、そのURLのOGP情報を返す
 import datetime
 import json
 import logging
-from tornado import httpclient
+from urllib.parse import urlsplit
 
 from celery import current_app as current_celeryapp, chain
+from tornado import httpclient
 
 from naumanni import celery as naumanni_celery
 from naumanni.plugin import Plugin
@@ -82,7 +83,6 @@ def crawl_ogp_url(url):
     logger.debug('crawl_ogp_url %r', url)
     assert url.startswith('http://') or url.startswith('https://')
     http_client = httpclient.HTTPClient()
-    # TODO: User-Agent
     response = http_client.fetch(url, raise_error=False, user_agent=USER_AGENT)
     if response.code == 200:
         content_type = response.headers['Content-Type']
@@ -128,7 +128,11 @@ def process_meta(url, meta=None, original_url=None):
             elif meta.get('link:canonical') != url:
                 next_url = meta['link:canonical']
 
-        # TODO: host名が同一かチェックする
+        original_url_parsed = urlsplit(original_url)
+        next_url_parsed = urlsplit(next_url)
+        if original_url_parsed.netloc != next_url_parsed.netloc:
+            logger.info('netloc mismatch, ignore next_url %s %s %s', original_url, url, next_url)
+            next_url = None
 
         if 'content_type' in meta:
             # not html
