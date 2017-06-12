@@ -54,7 +54,14 @@ export default function initialize({api, uiComponents}) {
       let style
       const {image, title, target_url} = meta
       let description = meta.description
-      const url = new URL(meta.url)
+      let url
+
+      try {
+        url = new URL(meta.url)
+      } catch(e) {
+        console.error && console.error('invalid url: ', url, e)  // eslint-disable-line no-console
+        return null
+      }
 
       if(image) {
         // TODO: imageがクソデカイとどうなるのか?
