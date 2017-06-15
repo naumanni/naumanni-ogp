@@ -42,8 +42,8 @@ export default function initialize({api, uiComponents}) {
 
     renderURLMeta(meta) {
       meta = new OGPMetaRecord(meta)
-      // html以外にはcontent_typeがつく
-      if(meta.content_type) {
+      // html以外にはメタ情報はいいや
+      if(meta.content_type !== 'text/html') {
         return null
       }
       // errorだったら表示しない
