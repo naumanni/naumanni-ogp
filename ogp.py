@@ -32,9 +32,13 @@ def parse_ogp(html):
             rv['link:canonical'] = node['href']
 
     for key in ['image', 'title', 'type', 'description']:
-        val = globals()['scrape_{}'.format(key)](doc)
-        if val:
-            rv['scrape:{}'.format(key)] = val
+        try:
+            val = globals()['scrape_{}'.format(key)](doc)
+        except AttributeError:
+            pass
+        else:
+            if val:
+                rv['scrape:{}'.format(key)] = val
 
     return rv
 

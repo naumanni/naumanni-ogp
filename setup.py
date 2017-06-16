@@ -9,6 +9,7 @@ setup(
     py_modules=['naumanni_ogp'],
     install_requires=[
         'beautifulsoup4',
+        'chardet',
     ],
     entry_points={
         'naumanni.plugins': [

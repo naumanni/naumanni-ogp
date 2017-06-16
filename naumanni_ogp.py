@@ -80,11 +80,17 @@ async def crawl_ogp_url(app_ref, url, level=0):
     # 与えられたURLをクロールしてメタデータを保存
     for redirect in range(3):
         logger.debug('crawl_ogp_url %r', url)
-        assert url.startswith('http://') or url.startswith('https://')
+        if not (url.startswith('http://') or url.startswith('https://')):
+            logger.debug('bad url : %s', url)
+            # bad url
+            return
+
         response = await app.crawl_url(url)
         if 300 <= response.code < 400 and 'location' in response.headers:
+            before = url
             url = response.headers['Location']
-            history.append(url)
+            logger.debug(' redirect %s -> %s', before, url)
+            original_url = url
             continue
         break
 
@@ -127,7 +133,9 @@ async def crawl_ogp_url(app_ref, url, level=0):
 
 
 def _get_content_type(response):
-    content_type = response.headers['Content-Type']
+    content_type = response.headers.get('Content-Type')
+    if not content_type:
+        return None
     if ';' in content_type:
         content_type = content_type.split(';', 1)[0]
     return content_type
