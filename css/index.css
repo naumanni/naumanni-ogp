@@ -2,7 +2,6 @@ $ogpImageWidth: 128px;
 $ogpImageHeight: 128px;
 
 .ogp-urlMetas {
-  margin-top: $marginDefault;
 }
 
 .ogp-urlMeta {
@@ -13,6 +12,7 @@ $ogpImageHeight: 128px;
   min-height: 80px;
   color: $colorText;
   overflow: hidden;
+  margin-top: $marginDefault;
 
   &:hover {
     text-decoration: none;
